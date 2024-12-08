@@ -1,10 +1,10 @@
-package es.trapasoft.student.service;
+package es.logicacenter.notificador.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import es.trapasoft.student.entity.Venta;
-import es.trapasoft.student.repository.VentaRepository;
+import es.logicacenter.notificador.entity.Venta;
+import es.logicacenter.notificador.repository.VentaRepository;
 @Service 
 public class VentaServiceImpl  implements VentaService  {
 

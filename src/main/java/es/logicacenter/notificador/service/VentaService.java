@@ -1,6 +1,6 @@
-package es.trapasoft.student.service;
+package es.logicacenter.notificador.service;
 
-import es.trapasoft.student.entity.Venta;
+import es.logicacenter.notificador.entity.Venta;
 
 public interface VentaService {
 

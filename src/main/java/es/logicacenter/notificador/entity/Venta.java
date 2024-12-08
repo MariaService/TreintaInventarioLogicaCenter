@@ -1,4 +1,4 @@
-package es.trapasoft.student.entity;
+package es.logicacenter.notificador.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

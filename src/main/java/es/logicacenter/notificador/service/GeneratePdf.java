@@ -1,4 +1,4 @@
-package es.trapasoft.student.service;
+package es.logicacenter.notificador.service;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;

@@ -1,4 +1,4 @@
-package es.trapasoft.student;
+package es.logicacenter.notificador;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import es.trapasoft.student.vo.PdfResponse;
+import es.logicacenter.notificador.vo.PdfResponse;
 
 @SpringBootTest
 class StudentApplicationTests {

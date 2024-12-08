@@ -1,4 +1,4 @@
-package es.trapasoft.student.service;
+package es.logicacenter.notificador.service;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.trapasoft.student.entity.Venta;
-import es.trapasoft.student.vo.PdfResponse;
+import es.logicacenter.notificador.entity.Venta;
+import es.logicacenter.notificador.vo.PdfResponse;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

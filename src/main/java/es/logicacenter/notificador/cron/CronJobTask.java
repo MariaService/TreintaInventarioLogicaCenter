@@ -1,4 +1,4 @@
-package es.trapasoft.student.cron;
+package es.logicacenter.notificador.cron;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import es.trapasoft.student.service.PdfReader;
-import es.trapasoft.student.vo.PdfResponse;
+import es.logicacenter.notificador.service.PdfReader;
+import es.logicacenter.notificador.vo.PdfResponse;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -43,7 +43,7 @@ public class CronJobTask {
 	@Autowired
 	private PdfReader pdd;
 
-	@Scheduled(cron = "0 */1 * * * ?") // Formato CRON
+	//@Scheduled(cron = "0 */1 * * * ?") // Formato CRON
 	public void ejecutarCadaDosMinuto() throws IOException {
 		log.info("Tarea ejecutada a las: " + obtenerfechaActual());
 		// inicio

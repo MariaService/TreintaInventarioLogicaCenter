@@ -1,4 +1,4 @@
-package es.trapasoft.student.service;
+package es.logicacenter.notificador.service;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
