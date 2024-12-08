@@ -1,0 +1,35 @@
+
+<configuration>
+    <!-- Definir el appender de la consola (opcional, para salida en consola) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Definir el appender de archivos con rotación -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Ruta donde se guardarán los archivos de log -->
+        <file>C://opt/logs/aplicacion.log</file>
+
+        <!-- Configuración de rotación basada en el tiempo -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Patrones de nombres para los archivos de log rotados -->
+           <fileNamePattern>C://opt/logs/aplicacion-%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- Eliminar los archivos después de 7 días -->
+            <maxHistory>2</maxHistory>
+        </rollingPolicy>
+
+        <!-- Configuración del formato del log -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Configurar el logger principal para usar los appenders definidos -->
+    <root level="info">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
