@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import es.logicacenter.notificador.entity.Inventario;
 import es.logicacenter.notificador.entity.Venta;
 import es.logicacenter.notificador.vo.InventarioResponse;
 import es.logicacenter.notificador.vo.PdfResponse;
@@ -35,16 +36,22 @@ public class PdfReader {
 
 	private static final Logger log = LoggerFactory.getLogger(PdfReader.class);
 
-	private final VentaService ventaServ;
-	
-	
-	@Value("${param.max.dia}")
+	private final VentaService ventaService;
+
+	@Value("${param.dia}")
 	private int diaMax;
-	
+
+	/*
+	 * @Autowired public PdfReader(VentaService ventaServ) { this.ventaServ =
+	 * ventaServ; this.inventarioService = null; }
+	 * 
+	 * @Autowired public PdfReader(InventarioService inventarioService) {
+	 * this.ventaServ = null; this.inventarioService = inventarioService; }
+	 */
 
 	@Autowired
-	public PdfReader(VentaService ventaServ) {
-		this.ventaServ = ventaServ;
+	public PdfReader(VentaService ventaService) {
+		this.ventaService = ventaService;
 	}
 
 	public void pdfRead(PdfResponse pdf, String filename) {
@@ -130,8 +137,9 @@ public class PdfReader {
 		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String fechaHoraFormateada = fechaHoraActual.format(formato);
 		// Imprimir la fecha y hora actual
-		return fechaHoraFormateada + "Venta.*";
 
+
+		 return fechaHoraFormateada + "Venta.*";
 	}
 
 	public JSONObject parseVenta(String line, PdfResponse pdf, int consecutivo) throws IOException {
@@ -161,17 +169,21 @@ public class PdfReader {
 		ventaPersi.setMonto(ExtraerMonto(ventaPersi.getDescripcion()));
 		ventaPersi.setConsecutivo(consecutivo);
 		ventaPersi.setFolio(generateFolio(ventaPersi, consecutivo));
-		int isExiteFolio = ventaServ.countVentaPorfolio(generateFolio(ventaPersi, consecutivo));
+		int isExiteFolio = ventaService.countVentaPorfolio(generateFolio(ventaPersi, consecutivo));
 
 		if (isExiteFolio == 0) {
 			// existe folio
 			log.info(" Nuevo folio ****** " + ventaPersi.getFolio());
 			ventaPersi.setIsNotificacion(1);
+
+			log.info("Se envia notificacion");
 			messageEnviadoNotificacion(ventaPersi.getDescripcion());
+
 			persitenciaVenta(ventaPersi);
 			// consultar inventario
+
 			consultaServicioInventario();
-			
+
 		} else {
 			// crearemos una venta en base de datos
 			log.info("ya existe folio en la base de datos" + generateFolio(ventaPersi, consecutivo));
@@ -186,7 +198,7 @@ public class PdfReader {
 	}
 
 	public Venta persitenciaVenta(Venta venta) {
-		return ventaServ.saveVenta(venta);
+		return ventaService.saveVenta(venta);
 	}
 
 	private double ExtraerMonto(String cadena) {
@@ -211,7 +223,7 @@ public class PdfReader {
 		MediaType mediaType = MediaType.parse("text/plain");
 		RequestBody body = RequestBody.create(mediaType, "");
 		Request request = new Request.Builder().url(
-				"https://api.telegram.org/bot7634748283:AAGNZxOhT_hSesXwpCX6awSuOsTB-_dARQ0/sendMessage?chat_id=@grupoventaTest&text="
+				"https://api.telegram.org/bot7407891330:AAGdJGgQAapdSAAdBd5F3Uv761-ahMgrG0I/sendMessage?chat_id=@NotificacionVenta&text="
 						+ msj)
 				.addHeader("Authorization", "Basic Og==").build();
 		Response response = client.newCall(request).execute();
@@ -241,10 +253,11 @@ public class PdfReader {
 				new TypeReference<List<InventarioResponse>>() {
 				});
 		for (InventarioResponse producto : productos) {
+			// actualizar
 			if (producto.getStock() == diaMax) {
 				mesajeNotificacionInventario(producto.getName(), producto.getStock());
 				log.info(" ***********" + producto.getName() + producto.getStock());
-				
+
 			}
 
 		}
@@ -255,7 +268,7 @@ public class PdfReader {
 		MediaType mediaType = MediaType.parse("text/plain");
 		RequestBody body = RequestBody.create(mediaType, "");
 		Request request = new Request.Builder().url(
-				"https://api.telegram.org/bot7634748283:AAGNZxOhT_hSesXwpCX6awSuOsTB-_dARQ0/sendMessage?chat_id=@grupoventaTest&text="
+				"https://api.telegram.org/bot7841587623:AAHKEjAlwqeVEtfKmct6tAvdTqW8J4AuH7M/sendMessage?chat_id=@inventariocenter&text="
 						+ msj + " " + "Cantidad en Almacen " + stock + " " + "disponibles")
 
 				.addHeader("Authorization", "Basic Og==").build();

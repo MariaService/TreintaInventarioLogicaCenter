@@ -135,9 +135,8 @@ class StudentApplicationTests {
 				MediaType mediaType = MediaType.parse("text/plain");
 				RequestBody body = RequestBody.create(mediaType, "");
 				Request request = new Request.Builder()
-				  .url("https://api.telegram.org/bot7634748283:AAGNZxOhT_hSesXwpCX6awSuOsTB-_dARQ0/sendMessage?chat_id=@grupoventaTest&text=03/12/2024 Venta carlos 2130 - Pagada Efectivo $1")
-				 
-				  .addHeader("Authorization", "Basic Og==")
+				  .url("https://api.telegram.org/bot7407891330:AAGdJGgQAapdSAAdBd5F3Uv761-ahMgrG0I/sendMessage?chat_id=@NotificacionVenta&text=03/12/2024 Venta carlos 2130 - Pagada Efectivo $1")
+				  .get()
 				  .build();
 				Response response = client.newCall(request).execute();
 	}

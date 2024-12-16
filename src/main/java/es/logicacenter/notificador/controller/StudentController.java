@@ -12,5 +12,7 @@ public class StudentController {
 		model.addAttribute("imageName", "http-cat-200.png");
 		return "index";
 	}
+	
+	
 
 }

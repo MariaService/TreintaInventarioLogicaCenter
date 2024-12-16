@@ -43,7 +43,7 @@ public class CronJobTask {
 	@Autowired
 	private PdfReader pdd;
 
-	//@Scheduled(cron = "0 */1 * * * ?") // Formato CRON
+	@Scheduled(cron = "0 */1 * * * ?") // Formato CRON
 	public void ejecutarCadaDosMinuto() throws IOException {
 		log.info("Tarea ejecutada a las: " + obtenerfechaActual());
 		// inicio
@@ -166,5 +166,10 @@ public class CronJobTask {
 		// Mostrar el resultado
 		return timestamp;
 	}
+	
+	
+	
+	
+	
 
 }

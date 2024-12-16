@@ -1,16 +1,18 @@
-package es.logicacenter.notificador;
+package es.logicacenter.notificador.service;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.internal.build.AllowSysOut;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import es.logicacenter.notificador.entity.Inventario;
 import es.logicacenter.notificador.vo.InventarioResponse;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -18,16 +20,32 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-@SpringBootTest
-class InventarioTest {
+@Component
+public class InventarioBussine {
 
-	@Test
-	void contextLoads() {
+	private static final Logger log = LoggerFactory.getLogger(InventarioBussine.class);
+
+	private final InventarioService inventarioService;
+
+	
+	@Value("${param.dia}")
+	private int diaMax;
+	
+	
+	@Autowired
+	public InventarioBussine(InventarioService inventarioService) {
+		this.inventarioService = inventarioService;
 	}
 
-	@Test
-	void ConsultaService() throws IOException {
-		// -- consumir servicos
+	public void test() {
+		log.info("test de persistencia");
+		Inventario inv = new Inventario();
+		inv.setName("Test");
+		inventarioService.saveVenta(inv);
+	}
+
+
+	public void consultaServicioInventario() throws IOException {
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse("application/json");
 		RequestBody body = RequestBody.create(mediaType,
@@ -45,29 +63,28 @@ class InventarioTest {
 		ObjectMapper objectMapper = new ObjectMapper();
 		String jsonString = response.body().string();
 
+		log.info("Consultado Inevatrio. ");
 		List<InventarioResponse> productos = objectMapper.readValue(jsonString,
 				new TypeReference<List<InventarioResponse>>() {
 				});
 		for (InventarioResponse producto : productos) {
-			if (producto.getStock() == 0) {
-				mesajeNotiofiacion(producto.getName(), producto.getStock());
-				System.out.println(" ***********" + producto.getName() + producto.getStock());
+			// actualizar
+			if (producto.getStock() == diaMax) {
+				mesajeNotificacionInventario(producto.getName(), producto.getStock());
+				log.info(" ***********" + producto.getName() + producto.getStock());
+
 			}
 
 		}
-
 	}
 
-	@Test
-	 void mesajeNotiofiacion(String msj, int stock) throws IOException {
-		 msj = "sinventario test";
-		 stock = 0;
-		
+	/// mensaje de notificacion 
+	private void mesajeNotificacionInventario(String msj, int stock) throws IOException {
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse("text/plain");
 		RequestBody body = RequestBody.create(mediaType, "");
 		Request request = new Request.Builder().url(
-				"https://api.telegram.org/bot7841587623:AAHKEjAlwqeVEtfKmct6tAvdTqW8J4AuH7M/sendMessage?chat_id=@inventariocenter&text=jknzxjkcnk"
+				"https://api.telegram.org/bot7841587623:AAHKEjAlwqeVEtfKmct6tAvdTqW8J4AuH7M/sendMessage?chat_id=@inventariocenter&text="
 						+ msj + " " + "Cantidad en Almacen " + stock + " " + "disponibles")
 
 				.addHeader("Authorization", "Basic Og==").build();
