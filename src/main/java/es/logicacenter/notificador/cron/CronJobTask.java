@@ -62,6 +62,7 @@ public class CronJobTask {
 		} else {
 			log.error("no se pudo descargar el archivo");
 			// ocurrio un error
+		
 		}
 
 	}
