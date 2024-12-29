@@ -50,16 +50,17 @@ class InventarioTest {
 				});
 		for (InventarioResponse producto : productos) {
 			if (producto.getStock() == 0) {
-				mesajeNotiofiacion(producto.getName(), producto.getStock());
+				mesajeNotiofiacion(producto.getName(), producto.getStock(), producto.getPrice());
 				System.out.println(" ***********" + producto.getName() + producto.getStock());
 			}
 
 		}
 
+		
 	}
 
 	@Test
-	 void mesajeNotiofiacion(String msj, int stock) throws IOException {
+	 void mesajeNotiofiacion(String msj, int stock, double precio) throws IOException {
 		 msj = "sinventario test";
 		 stock = 0;
 		
@@ -68,7 +69,8 @@ class InventarioTest {
 		RequestBody body = RequestBody.create(mediaType, "");
 		Request request = new Request.Builder().url(
 				"https://api.telegram.org/bot7841587623:AAHKEjAlwqeVEtfKmct6tAvdTqW8J4AuH7M/sendMessage?chat_id=@inventariocenter&text=jknzxjkcnk"
-						+ msj + " " + "Cantidad en Almacen " + stock + " " + "disponibles")
+						+ msj + " " + "Cantidad en Almacen " + stock + " " + "disponibles "  +  "$" + precio)
+				
 
 				.addHeader("Authorization", "Basic Og==").build();
 		Response response = client.newCall(request).execute();

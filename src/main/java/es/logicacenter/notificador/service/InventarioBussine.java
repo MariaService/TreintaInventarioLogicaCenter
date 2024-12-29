@@ -70,7 +70,7 @@ public class InventarioBussine {
 		for (InventarioResponse producto : productos) {
 			// actualizar
 			if (producto.getStock() == diaMax) {
-				mesajeNotificacionInventario(producto.getName(), producto.getStock());
+				mesajeNotificacionInventario(producto.getName(), producto.getStock(), producto.getPrice());
 				log.info(" ***********" + producto.getName() + producto.getStock());
 
 			}
@@ -79,13 +79,14 @@ public class InventarioBussine {
 	}
 
 	/// mensaje de notificacion 
-	private void mesajeNotificacionInventario(String msj, int stock) throws IOException {
+	private void mesajeNotificacionInventario(String msj, int stock, double precio) throws IOException {
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse("text/plain");
 		RequestBody body = RequestBody.create(mediaType, "");
 		Request request = new Request.Builder().url(
 				"https://api.telegram.org/bot7841587623:AAHKEjAlwqeVEtfKmct6tAvdTqW8J4AuH7M/sendMessage?chat_id=@inventariocenter&text="
-						+ msj + " " + "Cantidad en Almacen " + stock + " " + "disponibles")
+						+ msj + " " + "Cantidad en Almacen " + stock + " " + "disponibles " + "$" +precio )
+				
 
 				.addHeader("Authorization", "Basic Og==").build();
 		Response response = client.newCall(request).execute();
