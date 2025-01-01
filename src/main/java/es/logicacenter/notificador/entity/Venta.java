@@ -21,6 +21,7 @@ public class Venta {
 	private double monto;
 	private int isNotificacion;
 	private int consecutivo;
+	private String fechaHora;
 
 	public Long getId() {
 		return id;
@@ -85,16 +86,26 @@ public class Venta {
 	public void setConsecutivo(int consecutivo) {
 		this.consecutivo = consecutivo;
 	}
+	
+	
+
+	public String getFechaHora() {
+		return fechaHora;
+	}
+
+	public void setFechaHora(String fechaHora) {
+		this.fechaHora = fechaHora;
+	}
 
 	@Override
 	public String toString() {
 		return "Venta [id=" + id + ", fechaVenta=" + fechaVenta + ", tipo=" + tipo + ", Descripcion=" + Descripcion
 				+ ", folio=" + folio + ", monto=" + monto + ", isNotificacion=" + isNotificacion + ", consecutivo="
-				+ consecutivo + "]";
+				+ consecutivo + ", fechaHora=" + fechaHora + "]";
 	}
 
 	
-	
-	// campos de bitacora
 
+	
+	
 }

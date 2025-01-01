@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.logicacenter.notificador.service.PdfReader;
+import es.logicacenter.notificador.service.VentaBravo;
 import es.logicacenter.notificador.vo.PdfResponse;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -42,6 +43,9 @@ public class CronJobTask {
 
 	@Autowired
 	private PdfReader pdd;
+	
+	@Autowired
+	private VentaBravo ventaBravo;
 
 	@Scheduled(cron = "0 */1 * * * ?") // Formato CRON
 	public void ejecutarCadaDosMinuto() throws IOException {
@@ -64,6 +68,11 @@ public class CronJobTask {
 			// ocurrio un error
 		
 		}
+		
+		// tienda bravo
+		 log.info("Se consulta tienda Bravo ...");
+
+		 ventaBravo.bravoMain();
 
 	}
 
@@ -159,13 +168,21 @@ public class CronJobTask {
 		//
 //		
 //		LocalDateTime fecha_ = LocalDateTime.of(2024, 12, 04, 0, 0, 0);
-		int diaReporte = dia + 1;
-		LocalDateTime fecha_ = LocalDateTime.of(año, mes, diaReporte, 0, 0, 0);
+		int diaReporte = dia ;
+		LocalDateTime fecha_ = LocalDateTime.of(año, mes, diaReporte  , 0, 0, 0);
 		// Convertir a timestamp en milisegundos (UTC)
 		long timestamp = fecha_.toInstant(ZoneOffset.UTC).toEpochMilli();
 
+		 long fechaInicial = timestamp;
+
+	        // Diferencia en milisegundos (6 horas)
+	        long diferenciaMillis = 6 * 60 * 60 * 1000; // 6 horas a milisegundos
+
+	        // Calcular la nueva fecha
+	        long fechaFinal = fechaInicial + diferenciaMillis;
+		
 		// Mostrar el resultado
-		return timestamp;
+		return fechaFinal;
 	}
 	
 	

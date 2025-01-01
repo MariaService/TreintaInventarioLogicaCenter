@@ -24,6 +24,8 @@ public class CronjobInventarioTask {
 	public void test() throws IOException {
 		log.info("Tarea ejecutada a las: " + obtenerfechaActual());
 		inventarioBussine.consultaServicioInventario();
+	
+	
 	}
 
 	private String obtenerfechaActual() {

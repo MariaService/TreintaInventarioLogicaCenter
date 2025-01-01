@@ -1,5 +1,7 @@
 package es.logicacenter.notificador;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,14 +13,14 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import es.logicacenter.notificador.vo.PdfResponse;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import es.logicacenter.notificador.vo.PdfResponse;
 
 @SpringBootTest
 class StudentApplicationTests {
@@ -100,36 +102,65 @@ class StudentApplicationTests {
 
 	@Test
 	void ClientePdf() throws IOException {
-		OkHttpClient client = new OkHttpClient().newBuilder()
-				  .build();
-				MediaType mediaType = MediaType.parse("application/json");
-				@SuppressWarnings("deprecation")
-				RequestBody body = RequestBody.create(mediaType, "{\r\n    \"storeId\": \"47741e3f-634c-5944-a651-becbfee55cf7\",\r\n    \"userId\": \"cb02287f-7b46-5497-a2f6-114c3dcd60e4\",\r\n    \"firstDate\": 1733270400000,\r\n    \"type\": \"day\",\r\n    \"timezone\": \"America/Mexico_City\",\r\n    \"locale\": \"es-CO\",\r\n    \"zoom\": \"25%\"\r\n}\r\n\r\n");
-				Request request = new Request.Builder()
-				  .url("https://api.prod.treinta.co/transaction/generate-pdf")
-				  .method("POST", body)
-				  .addHeader("Content-Type", "application/json")
-				  .build();
-				Response response = client.newCall(request).execute();
-				
-				String jsonString =response.body().string();
-				 ObjectMapper objectMapper = new ObjectMapper();
+		OkHttpClient client = new OkHttpClient().newBuilder().build();
+		MediaType mediaType = MediaType.parse("application/json");
+		@SuppressWarnings("deprecation")
+		RequestBody body = RequestBody.create(mediaType,
+				"{\r\n    \"storeId\": \"47741e3f-634c-5944-a651-becbfee55cf7\",\r\n    \"userId\": \"cb02287f-7b46-5497-a2f6-114c3dcd60e4\",\r\n    \"firstDate\": 1733270400000,\r\n    \"type\": \"day\",\r\n    \"timezone\": \"America/Mexico_City\",\r\n    \"locale\": \"es-CO\",\r\n    \"zoom\": \"25%\"\r\n}\r\n\r\n");
+		Request request = new Request.Builder().url("https://api.prod.treinta.co/transaction/generate-pdf")
+				.method("POST", body).addHeader("Content-Type", "application/json").build();
+		Response response = client.newCall(request).execute();
 
-			        try {
-			            // Convertir JSON a objeto Java
-			            PdfResponse response_ = objectMapper.readValue(jsonString, PdfResponse.class);
+		String jsonString = response.body().string();
+		ObjectMapper objectMapper = new ObjectMapper();
 
-			            // Imprimir algunos datos para verificar
-			            System.out.println("Ruta del PDF: " + response_.getFilePath());
-			           
-			        } catch (Exception e) {
-			            e.printStackTrace();
-			        }
-				
+		try {
+			// Convertir JSON a objeto Java
+			PdfResponse response_ = objectMapper.readValue(jsonString, PdfResponse.class);
+
+			// Imprimir algunos datos para verificar
+			System.out.println("Ruta del PDF: " + response_.getFilePath());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	@Test
+	void MessageEnviado() throws IOException {
+		OkHttpClient client = new OkHttpClient().newBuilder().build();
+		MediaType mediaType = MediaType.parse("text/plain");
+		RequestBody body = RequestBody.create(mediaType, "");
+
+		String template = "Aquí tienes algunos titulares destacados del día en México:\n" + "\n" + "- México: %s\n"
+				+ "- Investigación: %s\n" + "- Samuel: %s\n" + "- Lluvia: %s\n" + "- Falla: %s\n" + "- Seguridad: %s\n"
+				+ "- EE.UU.: %s\n" + "- Religión: %s\n" + "- Deportes: %s\n" + "\n"
+				+ "Estos titulares se basan en información disponible en la web.";
+		// Datos dinámicos (rellena según lo necesario)
+		String mexico = "Claudia Sheinbaum señala que los gobernadores deben asumir su responsabilidad en seguridad.";
+		String investigacion = "Mauricio 'mete lupa' a licencias de torres Gala en Nuevo León.";
+		String samuel = "Dispuesto a negociar más con el Congreso de Nuevo León para el presupuesto.";
+		String lluvia = "Rompe bordo en la Vhsa-Teapa.";
+		String falla = "CFE afecta a 400 mil usuarios.";
+		String seguridad = "México es el 4to país más peligroso del mundo según ACLED.";
+		String eeuu = "Trump planea usar el ejército para deportaciones.";
+		String religion = "Papa Francisco celebra a la Virgen de Guadalupe.";
+		String deportes = "Hoy inicia la final entre América y Monterrey en fútbol.";
+
+		// Rellenamos el template
+		String titulares = String.format(template, mexico, investigacion, samuel, lluvia, falla, seguridad, eeuu,
+				religion, deportes);
+
+		Request request = new Request.Builder().url(
+				"https://api.telegram.org/bot7634748283:AAGNZxOhT_hSesXwpCX6awSuOsTB-_dARQ0/sendMessage?chat_id=@grupoventatest&text="
+						+ titulares)
+				.get().build();
+		Response response = client.newCall(request).execute();
 	}
 	
 	@Test
-	void MessageEnviado() throws IOException {
+	void MessageEnviadoT() throws IOException {
 		OkHttpClient client = new OkHttpClient().newBuilder()
 				  .build();
 				MediaType mediaType = MediaType.parse("text/plain");
@@ -141,4 +172,5 @@ class StudentApplicationTests {
 				Response response = client.newCall(request).execute();
 	}
 
+	
 }

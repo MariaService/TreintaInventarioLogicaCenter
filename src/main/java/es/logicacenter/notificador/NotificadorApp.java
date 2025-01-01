@@ -1,3 +1,4 @@
+
 package es.logicacenter.notificador;
 
 import org.springframework.boot.SpringApplication;

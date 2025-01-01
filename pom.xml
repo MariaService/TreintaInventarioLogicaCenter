@@ -87,6 +87,13 @@
         <artifactId>slf4j-api</artifactId>
         <version>1.7.36</version>
     </dependency>
+    
+    <dependency>
+    <groupId>org.telegram</groupId>
+    <artifactId>telegrambots</artifactId>
+    <version>6.7.0</version> <!-- Reemplaza con la versión más reciente -->
+</dependency>
+
 
     <!-- Implementación con Logback -->
     <dependency>

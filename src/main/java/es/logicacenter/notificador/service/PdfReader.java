@@ -41,13 +41,14 @@ public class PdfReader {
 	@Value("${param.dia}")
 	private int diaMax;
 
-	/*
-	 * @Autowired public PdfReader(VentaService ventaServ) { this.ventaServ =
-	 * ventaServ; this.inventarioService = null; }
-	 * 
-	 * @Autowired public PdfReader(InventarioService inventarioService) {
-	 * this.ventaServ = null; this.inventarioService = inventarioService; }
-	 */
+	@Value("${param.token}")
+	private String token;
+
+	@Value("${param.chatId}")
+	private String chatId;
+
+	@Value("${param.chatidInventario}")
+	private String chatidInventario;
 
 	@Autowired
 	public PdfReader(VentaService ventaService) {
@@ -138,8 +139,7 @@ public class PdfReader {
 		String fechaHoraFormateada = fechaHoraActual.format(formato);
 		// Imprimir la fecha y hora actual
 
-
-		 return fechaHoraFormateada + "Venta.*";
+		return fechaHoraFormateada + "Venta.*";
 	}
 
 	public JSONObject parseVenta(String line, PdfResponse pdf, int consecutivo) throws IOException {
@@ -155,6 +155,8 @@ public class PdfReader {
 		JSONObject venta = new JSONObject();
 		venta.put("fecha", fecha);
 		ventaPersi.setFechaVenta(fecha);
+
+		ventaPersi.setFechaHora(fechaHoraVenta());
 		venta.put("tipo", "Venta");
 		ventaPersi.setTipo("venta");
 		venta.put("vendedor", vendedor);
@@ -176,13 +178,14 @@ public class PdfReader {
 			log.info(" Nuevo folio ****** " + ventaPersi.getFolio());
 			ventaPersi.setIsNotificacion(1);
 
-			log.info("Se envia notificacion");
+			log.info("Se envia notificacion a Venta");
 			messageEnviadoNotificacion(ventaPersi.getDescripcion());
 
 			persitenciaVenta(ventaPersi);
 			// consultar inventario
 
-			consultaServicioInventario();
+			TelegramBotDynamicTemplate telegramBotDynamicTemplate = new TelegramBotDynamicTemplate(token);
+			telegramBotDynamicTemplate.SigleTelegram(diaMax, token, chatidInventario);
 
 		} else {
 			// crearemos una venta en base de datos
@@ -190,6 +193,17 @@ public class PdfReader {
 		}
 
 		return venta;
+	}
+
+	private String fechaHoraVenta() {
+		LocalDateTime now = LocalDateTime.now();
+
+		// Definir el formato de la fecha y hora
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+		// Convertir la fecha y hora a String
+		String formattedDate = now.format(formatter);
+		return formattedDate;
 	}
 
 	public String generateFolio(Venta venta, int consecutivo) {
@@ -228,51 +242,6 @@ public class PdfReader {
 				.addHeader("Authorization", "Basic Og==").build();
 		Response response = client.newCall(request).execute();
 		log.info("se envia notificacion *******" + msj);
-	}
-
-	private void consultaServicioInventario() throws IOException {
-		OkHttpClient client = new OkHttpClient().newBuilder().build();
-		MediaType mediaType = MediaType.parse("application/json");
-		RequestBody body = RequestBody.create(mediaType,
-				"{\r\n    \"storeId\": \"47741e3f-634c-5944-a651-becbfee55cf7\",\r\n    \"userId\": \"cb02287f-7b46-5497-a2f6-114c3dcd60e4\",\r\n    \"countryId\": 2,\r\n    \"timezone\": \"America/Bogota\",\r\n    \"locale\": \"es-CO\",\r\n    \"zoom\": 25\r\n}");
-		Request request = new Request.Builder().url(
-				"https://api.prod.treinta.co/product/find?storeId=47741e3f-634c-5944-a651-becbfee55cf7&limit=100000")
-				.get().addHeader("X-Api-Key", "TRE1NT@WEB")
-				.addHeader("X-Hash-Signature", "94230538bfea6b3dbb422444c02973e119ee82f20c30ab3673df0fa70ffe3465")
-				.addHeader("Content-Type", "application/json")
-				.addHeader("Authorization",
-						"Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjNmZDA3MmRmYTM4MDU2NzlmMTZmZTQxNzM4YzJhM2FkM2Y5MGIyMTQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdHJlaW50YWNvIiwiYXVkIjoidHJlaW50YWNvIiwiYXV0aF90aW1lIjoxNzMzMTYxODgwLCJ1c2VyX2lkIjoicnpaR1JyUk0zc1djeEZZNEdXN3Q4YkpsSUt1MiIsInN1YiI6InJ6WkdSclJNM3NXY3hGWTRHVzd0OGJKbElLdTIiLCJpYXQiOjE3MzMxNjE4ODAsImV4cCI6MTczMzE2NTQ4MCwicGhvbmVfbnVtYmVyIjoiKzUyMjQ4MTM0OTYwMCIsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsicGhvbmUiOlsiKzUyMjQ4MTM0OTYwMCJdfSwic2lnbl9pbl9wcm92aWRlciI6ImN1c3RvbSJ9fQ.LvtWFE7uQQUzcdngUy9SWcxevvMTghiQftT2KwiBG9MJ-33eOqiKdA0mXOAHX16KtyTdt80WX4MEaHax8SsixJTZlJBmjI7c6XPank8S4iLPWoFateK9ZK5Ipm1FldeuneMlbkdUlXzBgDtiWnHtJYQikwKNOaBtsC7nKSXOoSCkPNgAiupWomsSCiLsW5QQs86FY9iUwL1YckZ0ia6oL4W49DoSYEhj5Y2mgMtdLF2ZlDIejKXL6N1_xUZRt-ld4VrV3Lf7aRFkSho1no_XNh_EEEG4gHdsuQm6mPYRJniSzSA5eGeVHzKPgbq_E2ptsfKqM3wZJgdLfwQEC_XJFQ")
-				.build();
-		Response response = client.newCall(request).execute();
-
-		ObjectMapper objectMapper = new ObjectMapper();
-		String jsonString = response.body().string();
-
-		log.info("Consultado Inevatrio. ");
-		List<InventarioResponse> productos = objectMapper.readValue(jsonString,
-				new TypeReference<List<InventarioResponse>>() {
-				});
-		for (InventarioResponse producto : productos) {
-			// actualizar
-			if (producto.getStock() == diaMax) {
-				mesajeNotificacionInventario(producto.getName(), producto.getStock());
-				log.info(" ***********" + producto.getName() + producto.getStock());
-
-			}
-
-		}
-	}
-
-	private void mesajeNotificacionInventario(String msj, int stock) throws IOException {
-		OkHttpClient client = new OkHttpClient().newBuilder().build();
-		MediaType mediaType = MediaType.parse("text/plain");
-		RequestBody body = RequestBody.create(mediaType, "");
-		Request request = new Request.Builder().url(
-				"https://api.telegram.org/bot7841587623:AAHKEjAlwqeVEtfKmct6tAvdTqW8J4AuH7M/sendMessage?chat_id=@inventariocenter&text="
-						+ msj + " " + "Cantidad en Almacen " + stock + " " + "disponibles")
-
-				.addHeader("Authorization", "Basic Og==").build();
-		Response response = client.newCall(request).execute();
 	}
 
 }
