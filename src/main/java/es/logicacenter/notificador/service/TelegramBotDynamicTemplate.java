@@ -111,7 +111,7 @@ public class TelegramBotDynamicTemplate extends DefaultAbsSender {
 		}
 
 		TelegramBotDynamicTemplate bot = new TelegramBotDynamicTemplate(token);
-		bot.sendDynamicMessage(chatId, titulares, suma, "MORELOS LOGICA CENTER");
+		bot.sendDynamicMessage(chatId, titulares, suma, "Lógica Center Morelos");
 		log.info("Se envia notificacion de inventario ...");
 	}
 
@@ -150,7 +150,7 @@ public class TelegramBotDynamicTemplate extends DefaultAbsSender {
 		}
 
 		TelegramBotDynamicTemplate bot = new TelegramBotDynamicTemplate(token);
-		bot.sendDynamicMessage(chatId, titulares, suma, "BRAVO LOGICA CENTER");
+		bot.sendDynamicMessage(chatId, titulares, suma, "lógica Center bravo");
 		log.info("Se envia notificacion de inventario ...");
 	}
 

@@ -179,13 +179,13 @@ public class PdfReader {
 			ventaPersi.setIsNotificacion(1);
 
 			log.info("Se envia notificacion a Venta");
-			messageEnviadoNotificacion(ventaPersi.getDescripcion());
+			//messageEnviadoNotificacion(ventaPersi.getDescripcion());
 
 			persitenciaVenta(ventaPersi);
 			// consultar inventario
 
-			TelegramBotDynamicTemplate telegramBotDynamicTemplate = new TelegramBotDynamicTemplate(token);
-			telegramBotDynamicTemplate.SigleTelegram(diaMax, token, chatidInventario);
+//			TelegramBotDynamicTemplate telegramBotDynamicTemplate = new TelegramBotDynamicTemplate(token);
+//			telegramBotDynamicTemplate.SigleTelegram(diaMax, token, chatidInventario);
 
 		} else {
 			// crearemos una venta en base de datos

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.logicacenter.notificador.service.PdfReader;
 import es.logicacenter.notificador.service.VentaBravo;
+import es.logicacenter.notificador.service.VentaLogicaCenter;
 import es.logicacenter.notificador.vo.PdfResponse;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -43,36 +44,20 @@ public class CronJobTask {
 
 	@Autowired
 	private PdfReader pdd;
-	
+
 	@Autowired
 	private VentaBravo ventaBravo;
+	
+	@Autowired
+	private VentaLogicaCenter ventaLogicaCenter;
 
 	@Scheduled(cron = "0 */1 * * * ?") // Formato CRON
 	public void ejecutarCadaDosMinuto() throws IOException {
 		log.info("Tarea ejecutada a las: " + obtenerfechaActual());
-		// inicio
-		CronJobTask task = new CronJobTask();
-		// consumo del servico
-		PdfResponse datosPedf = task.pdfResponse( obtenerTimeReporte());
-
-		if (datosPedf != null) {
-			// si hay archivo
-			// descargar el reporte
-			String rutaArchivo = ruta + fileName;
-			task.descargaFile(rutaArchivo, datosPedf.getFilePath());
-			// lectura del reporte
-			pdd.pdfRead(datosPedf, rutaArchivo);
-			// enviar notificacion
-		} else {
-			log.error("no se pudo descargar el archivo");
-			// ocurrio un error
-		
-		}
-		
-		// tienda bravo
-		 log.info("Se consulta tienda Bravo ...");
-
-		 ventaBravo.bravoMain();
+		log.info("Se consulta tienda  Logica center ...");
+		ventaLogicaCenter.LogicaCenterMain( obtenerTimeReporte());
+		log.info("Se consulta tienda Bravo ...");
+		ventaBravo.bravoMain();
 
 	}
 
@@ -83,7 +68,9 @@ public class CronJobTask {
 		MediaType mediaType = MediaType.parse("application/json");
 		@SuppressWarnings("deprecation")
 		RequestBody body = RequestBody.create(mediaType,
-				"{\r\n    \"storeId\": \"47741e3f-634c-5944-a651-becbfee55cf7\",\r\n    \"userId\": \"cb02287f-7b46-5497-a2f6-114c3dcd60e4\",\r\n    \"firstDate\": "+ fechaReporte+  ",\r\n    \"type\": \"day\",\r\n    \"timezone\": \"America/Mexico_City\",\r\n    \"locale\": \"es-CO\",\r\n    \"zoom\": \"25%\"\r\n}\r\n\r\n");
+				"{\r\n    \"storeId\": \"47741e3f-634c-5944-a651-becbfee55cf7\",\r\n    \"userId\": \"cb02287f-7b46-5497-a2f6-114c3dcd60e4\",\r\n    \"firstDate\": "
+						+ fechaReporte
+						+ ",\r\n    \"type\": \"day\",\r\n    \"timezone\": \"America/Mexico_City\",\r\n    \"locale\": \"es-CO\",\r\n    \"zoom\": \"25%\"\r\n}\r\n\r\n");
 		Request request = new Request.Builder().url("https://api.prod.treinta.co/transaction/generate-pdf")
 				.method("POST", body).addHeader("Content-Type", "application/json").build();
 		Response response = client.newCall(request).execute();
@@ -168,26 +155,21 @@ public class CronJobTask {
 		//
 //		
 //		LocalDateTime fecha_ = LocalDateTime.of(2024, 12, 04, 0, 0, 0);
-		int diaReporte = dia ;
-		LocalDateTime fecha_ = LocalDateTime.of(año, mes, diaReporte  , 0, 0, 0);
+		int diaReporte = dia;
+		LocalDateTime fecha_ = LocalDateTime.of(año, mes, diaReporte, 0, 0, 0);
 		// Convertir a timestamp en milisegundos (UTC)
 		long timestamp = fecha_.toInstant(ZoneOffset.UTC).toEpochMilli();
 
-		 long fechaInicial = timestamp;
+		long fechaInicial = timestamp;
 
-	        // Diferencia en milisegundos (6 horas)
-	        long diferenciaMillis = 6 * 60 * 60 * 1000; // 6 horas a milisegundos
+		// Diferencia en milisegundos (6 horas)
+		long diferenciaMillis = 6 * 60 * 60 * 1000; // 6 horas a milisegundos
 
-	        // Calcular la nueva fecha
-	        long fechaFinal = fechaInicial + diferenciaMillis;
-		
+		// Calcular la nueva fecha
+		long fechaFinal = fechaInicial + diferenciaMillis;
+
 		// Mostrar el resultado
 		return fechaFinal;
 	}
-	
-	
-	
-	
-	
 
 }
