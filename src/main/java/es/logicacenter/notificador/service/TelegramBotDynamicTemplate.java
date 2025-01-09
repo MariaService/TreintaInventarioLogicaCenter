@@ -66,7 +66,7 @@ public class TelegramBotDynamicTemplate extends DefaultAbsSender {
 			/*
 			 * se cacha la excedpcion y se envia el pdf 
 			 */
-			String rutaPdfInventario =pdfCreatro.GenerarPdf(fileNameInventario, news, nameTienda);
+			String rutaPdfInventario =pdfCreatro.GenerarPdf(fileNameInventario, news, nameTienda, sumaTotal);
 			EnviarTelegram(rutaPdfInventario); 
 			log.error(e.toString());
 		}

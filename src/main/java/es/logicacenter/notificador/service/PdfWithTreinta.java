@@ -1,6 +1,7 @@
 package es.logicacenter.notificador.service;
 
 import java.io.FileOutputStream;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import com.itextpdf.text.Document;
@@ -14,7 +15,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 public class PdfWithTreinta {
 
-	public String  GenerarPdf(String paranmetro, List<String> news, String nombreTienda) {
+	public String  GenerarPdf(String paranmetro, List<String> news, String nombreTienda, double total) {
 		// Ruta donde se guardará el PDF
 		String pdfFilePath = paranmetro;
 
@@ -34,6 +35,13 @@ public class PdfWithTreinta {
 			title.setAlignment(Element.ALIGN_CENTER);
 			document.add(title);
 			document.add(new Paragraph("\n")); // Salto de línea
+			Font totalCosto = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
+			Paragraph  titleCos = new Paragraph("Total Costo " + formatDecimal(total)  , totalCosto);
+			titleCos.setAlignment(Element.ALIGN_CENTER);
+			document.add(titleCos);
+			document.add(new Paragraph("\n")); // Salto de línea
+			
+			
 			PdfPTable table = new PdfPTable(1); // Número de columnas
 			// Encabezado de la tabla
 			PdfPCell headerCell = new PdfPCell(
@@ -61,4 +69,11 @@ public class PdfWithTreinta {
 		}
 		return pdfFilePath;
 	}
+	
+	private String formatDecimal(double num) {
+		DecimalFormat formato = new DecimalFormat("#,###.00");
+		// Formatear el número
+		return formato.format(num);
+	}
+
 }
