@@ -1,5 +1,6 @@
 package es.logicacenter.notificador.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -7,9 +8,12 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -28,6 +32,10 @@ public class TelegramBotDynamicTemplate extends DefaultAbsSender {
 
 	private final String botToken;
 
+	
+	private static final String fileNameInventario = "C:\\pdfDescarga\\inventario.pdf";
+
+	
 	public TelegramBotDynamicTemplate(String botToken) {
 		super(new DefaultBotOptions());
 		this.botToken = botToken;
@@ -52,8 +60,45 @@ public class TelegramBotDynamicTemplate extends DefaultAbsSender {
 			execute(message);
 		} catch (TelegramApiException e) {
 			e.printStackTrace();
+			//se envia pdf telegram
+			log.warn("se envia un archivo ya que el mensaje es muy grande ");
+			PdfWithTreinta pdfCreatro = new PdfWithTreinta(); 
+			/*
+			 * se cacha la excedpcion y se envia el pdf 
+			 */
+			String rutaPdfInventario =pdfCreatro.GenerarPdf(fileNameInventario, news, nameTienda);
+			EnviarTelegram(rutaPdfInventario); 
 			log.error(e.toString());
 		}
+	}
+
+	public void sendPdf(String chatId, File pdfFile) {
+		SendDocument sendDocument = new SendDocument();
+		sendDocument.setChatId(chatId);
+		sendDocument.setDocument(new InputFile(pdfFile));
+
+		try {
+			execute(sendDocument);
+			System.out.println("PDF enviado exitosamente!");
+		} catch (TelegramApiException e) {
+			System.err.println("Error al enviar el PDF: " + e.getMessage());
+		}
+	}
+
+	public void EnviarTelegram(String fileName) {
+		// Reemplaza con el token de tu bot y el ID del chat
+		String botToken = "7841587623:AAHKEjAlwqeVEtfKmct6tAvdTqW8J4AuH7M";
+		String chatId = "@inventariocenter";
+
+		
+		/// crear el pdf
+		
+		log.info("se crfeo pdf inventario");
+		// Ruta al archivo PDF
+		File pdfFile = new File(fileName);
+
+		TelegramBotDynamicTemplate botSender = new TelegramBotDynamicTemplate(botToken);
+		botSender.sendPdf(chatId, pdfFile);
 	}
 
 	private String formatDecimal(double num) {

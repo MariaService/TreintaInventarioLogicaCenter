@@ -44,6 +44,9 @@ public class VentaBravo {
 	private String chatidInventario;
 	
 	
+
+	
+	
 	@Autowired
 	public VentaBravo(VentaService ventaService) {
 		this.ventaService = ventaService;

@@ -60,6 +60,13 @@ public class CronJobTask {
 		ventaBravo.bravoMain();
 
 	}
+	
+	
+	
+	
+	
+	
+	
 
 	// consulta de servicio
 	public PdfResponse pdfResponse(long fechaReporte) throws IOException {
