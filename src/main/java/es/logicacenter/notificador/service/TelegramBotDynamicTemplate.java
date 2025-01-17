@@ -114,7 +114,7 @@ public class TelegramBotDynamicTemplate extends DefaultAbsSender {
 		}
 		return formattedNews.toString();
 	}
-
+	
 	// inventarioLoficaCenter
 	public void SigleTelegram(int parametro, String token, String chatId) throws IOException {
 

@@ -47,7 +47,7 @@ public class CronJobTask {
 
 	@Autowired
 	private VentaBravo ventaBravo;
-	
+
 	@Autowired
 	private VentaLogicaCenter ventaLogicaCenter;
 
@@ -55,18 +55,11 @@ public class CronJobTask {
 	public void ejecutarCadaDosMinuto() throws IOException {
 		log.info("Tarea ejecutada a las: " + obtenerfechaActual());
 		log.info("Se consulta tienda  Logica center ...");
-		ventaLogicaCenter.LogicaCenterMain( obtenerTimeReporte());
+		ventaLogicaCenter.LogicaCenterMain(obtenerTimeReporte());
 		log.info("Se consulta tienda Bravo ...");
 		ventaBravo.bravoMain();
 
 	}
-	
-	
-	
-	
-	
-	
-	
 
 	// consulta de servicio
 	public PdfResponse pdfResponse(long fechaReporte) throws IOException {

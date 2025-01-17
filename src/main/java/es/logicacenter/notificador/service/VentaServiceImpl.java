@@ -25,4 +25,11 @@ public class VentaServiceImpl  implements VentaService  {
 		return  ventaRepositori.contarVentasPorFolio(folio);
 	}
 
+
+	@Override
+	public double SumaMonto(String idTienda) {
+		// TODO Auto-generated method stub
+		return  ventaRepositori.SumaMontoTotal();
+	}
+
 }

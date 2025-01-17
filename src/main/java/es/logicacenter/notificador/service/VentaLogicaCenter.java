@@ -91,10 +91,19 @@ public class VentaLogicaCenter {
 					String soloFecha = venta.getFechaVenta().substring(0, 10);
 					venta.setMonto(transaction.getValue());
 					// 30/12/2024 Venta LOGICA CENTER ROSAS centro de carga tipo c - Pagada Efectivo $200
-					String msjeVentDescripcion = soloFecha + "- Lógica Center Morelos "+ transaction.getDescription() + "- Pagada Efectivo $" +transaction.getValue();
+					double tota= ventaService.SumaMonto( " Tienda ");
+					
+					double totalM = venta.getMonto() + tota;
+					
+					String msjeVentDescripcion = soloFecha + "💰 Lógica Center Morelos "+ transaction.getDescription() + "- Pagada Efectivo $" +transaction.getValue() +  " 💵 Monto Total de Venta $" + totalM;
+					
 					venta.setDescripcion( msjeVentDescripcion );
 					
 					// se envia la notificacion
+					
+					venta.setStoreId(transaction.getStoreId());
+					venta.setUserId(transaction.getUserId());
+					
 					venta.setIsNotificacion(messageEnviadoNotificacionVenta(msjeVentDescripcion));
 					persitenciaVenta(venta);
 					

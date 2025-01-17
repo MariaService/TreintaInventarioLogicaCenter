@@ -8,4 +8,6 @@ public interface VentaService {
 	Venta saveVenta( Venta venta);
 	
 	int countVentaPorfolio(String folio);
+	
+	double SumaMonto( String idTienda);
 }

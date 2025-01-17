@@ -22,6 +22,9 @@ public class Venta {
 	private int isNotificacion;
 	private int consecutivo;
 	private String fechaHora;
+	
+	private String userId;
+	private String storeId;
 
 	public Long getId() {
 		return id;
@@ -97,11 +100,27 @@ public class Venta {
 		this.fechaHora = fechaHora;
 	}
 
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getStoreId() {
+		return storeId;
+	}
+
+	public void setStoreId(String storeId) {
+		this.storeId = storeId;
+	}
+
 	@Override
 	public String toString() {
 		return "Venta [id=" + id + ", fechaVenta=" + fechaVenta + ", tipo=" + tipo + ", Descripcion=" + Descripcion
 				+ ", folio=" + folio + ", monto=" + monto + ", isNotificacion=" + isNotificacion + ", consecutivo="
-				+ consecutivo + ", fechaHora=" + fechaHora + "]";
+				+ consecutivo + ", fechaHora=" + fechaHora + ", userId=" + userId + ", storeId=" + storeId + "]";
 	}
 
 	
