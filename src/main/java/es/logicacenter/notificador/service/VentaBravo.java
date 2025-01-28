@@ -95,12 +95,17 @@ public class VentaBravo {
 					//String soloFecha = fechaHoraVenta().substring(0, 10);
 					String soloFecha = venta.getFechaVenta().substring(0, 10);
 					venta.setMonto(transaction.getValue());
+					double totalM = SumaMontoTotal( "63346365-3062-5566-b730-333266333235".trim(),"87d65767-13d2-58c7-a5d8-76c4ad6df3e0".trim() );
+					double operacionMonto =totalM + venta.getMonto();
 					// 30/12/2024 Venta LOGICA CENTER ROSAS centro de carga tipo c - Pagada Efectivo $200
-					String msjeVentDescripcion = soloFecha + "- lógica Center bravo"+ transaction.getDescription() + "- Pagada Efectivo $" +transaction.getValue();
-					venta.setDescripcion( msjeVentDescripcion );
+					String msjeVentDescripcion = soloFecha + "💰 lógica Center bravo "+ transaction.getDescription() + "- Pagada Efectivo $" +transaction.getValue() +  " 💵 Monto Total de Venta $" + operacionMonto;
 					
+					
+					venta.setDescripcion( msjeVentDescripcion );
+					venta.setStoreId(transaction.getStoreId());
+					venta.setUserId(transaction.getUserId());
 					// se envia la notificacion
-					venta.setIsNotificacion(messageEnviadoNotificacionVenta(msjeVentDescripcion));
+					//venta.setIsNotificacion(messageEnviadoNotificacionVenta(msjeVentDescripcion));
 					persitenciaVenta(venta);
 					
 					//se envia notifcacion inventario);
@@ -120,7 +125,10 @@ public class VentaBravo {
 
 	}
 	
-	
+	public double SumaMontoTotal(String userId, String storeId) {
+	    Double sumaMonto = ventaService.SumaMonto(userId, storeId);
+	    return sumaMonto != null ? sumaMonto : 0.0;
+	}
 	
 	
 	private String fechaHoraVenta() {

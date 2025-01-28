@@ -27,9 +27,9 @@ public class VentaServiceImpl  implements VentaService  {
 
 
 	@Override
-	public double SumaMonto(String idTienda) {
+	public double SumaMonto(String userId, String storeId) {
 		// TODO Auto-generated method stub
-		return  ventaRepositori.SumaMontoTotal();
+		return  ventaRepositori.SumaMontoTotal( userId,  storeId);
 	}
 
 }

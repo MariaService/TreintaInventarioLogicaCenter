@@ -9,5 +9,5 @@ public interface VentaService {
 	
 	int countVentaPorfolio(String folio);
 	
-	double SumaMonto( String idTienda);
+	double SumaMonto( String userId, String storeId);
 }
