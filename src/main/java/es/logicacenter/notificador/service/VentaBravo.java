@@ -105,7 +105,7 @@ public class VentaBravo {
 					venta.setStoreId(transaction.getStoreId());
 					venta.setUserId(transaction.getUserId());
 					// se envia la notificacion
-					//venta.setIsNotificacion(messageEnviadoNotificacionVenta(msjeVentDescripcion));
+					venta.setIsNotificacion(messageEnviadoNotificacionVenta(msjeVentDescripcion));
 					persitenciaVenta(venta);
 					
 					//se envia notifcacion inventario);
