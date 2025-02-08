@@ -1,5 +1,7 @@
 package es.logicacenter.notificador.entity;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,7 +16,7 @@ public class Venta {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String fechaVenta;
+	private Date fechaVenta;
 	private String tipo;
 	private String Descripcion;
 	private String folio;
@@ -22,7 +24,11 @@ public class Venta {
 	private int isNotificacion;
 	private int consecutivo;
 	private String fechaHora;
-	
+	private Integer tipoOperacion;
+	private String mensajeNotificacion;
+
+	private Integer catTienda;
+
 	private String userId;
 	private String storeId;
 
@@ -34,11 +40,11 @@ public class Venta {
 		this.id = id;
 	}
 
-	public String getFechaVenta() {
+	public Date getFechaVenta() {
 		return fechaVenta;
 	}
 
-	public void setFechaVenta(String fechaVenta) {
+	public void setFechaVenta(Date fechaVenta) {
 		this.fechaVenta = fechaVenta;
 	}
 
@@ -89,8 +95,6 @@ public class Venta {
 	public void setConsecutivo(int consecutivo) {
 		this.consecutivo = consecutivo;
 	}
-	
-	
 
 	public String getFechaHora() {
 		return fechaHora;
@@ -116,15 +120,43 @@ public class Venta {
 		this.storeId = storeId;
 	}
 
+	public Integer getTipoOperacion() {
+		return tipoOperacion;
+	}
+
+	public void setTipoOperacion(Integer tipoOperacion) {
+		this.tipoOperacion = tipoOperacion;
+	}
+
+	
+	
+	
+
+	public Integer getCatTienda() {
+		return catTienda;
+	}
+
+	public void setCatTienda(Integer catTienda) {
+		this.catTienda = catTienda;
+	}
+
+	public String getMensajeNotificacion() {
+		return mensajeNotificacion;
+	}
+
+	public void setMensajeNotificacion(String mensajeNotificacion) {
+		this.mensajeNotificacion = mensajeNotificacion;
+	}
+
 	@Override
 	public String toString() {
 		return "Venta [id=" + id + ", fechaVenta=" + fechaVenta + ", tipo=" + tipo + ", Descripcion=" + Descripcion
 				+ ", folio=" + folio + ", monto=" + monto + ", isNotificacion=" + isNotificacion + ", consecutivo="
-				+ consecutivo + ", fechaHora=" + fechaHora + ", userId=" + userId + ", storeId=" + storeId + "]";
+				+ consecutivo + ", fechaHora=" + fechaHora + ", tipoOperacion=" + tipoOperacion
+				+ ", mensajeNotificacion=" + mensajeNotificacion + ", catTienda=" + catTienda + ", userId=" + userId
+				+ ", storeId=" + storeId + "]";
 	}
 
-	
 
-	
-	
+
 }

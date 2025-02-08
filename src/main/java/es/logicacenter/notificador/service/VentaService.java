@@ -1,5 +1,7 @@
 package es.logicacenter.notificador.service;
 
+import java.util.List;
+
 import es.logicacenter.notificador.entity.Venta;
 
 public interface VentaService {
@@ -9,5 +11,7 @@ public interface VentaService {
 	
 	int countVentaPorfolio(String folio);
 	
-	double SumaMonto( String userId, String storeId);
+	double SumaMonto( Integer idTienda, Integer tipoOperacion);
+	
+	List<String> listaEgresoPorTienda(Integer idTienda, Integer tipoOpercion);
 }

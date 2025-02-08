@@ -1,5 +1,7 @@
 package es.logicacenter.notificador.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +29,16 @@ public class VentaServiceImpl  implements VentaService  {
 
 
 	@Override
-	public double SumaMonto(String userId, String storeId) {
+	public double SumaMonto(Integer idTienda, Integer tipoOpercion) {
 		// TODO Auto-generated method stub
-		return  ventaRepositori.SumaMontoTotal( userId,  storeId);
+		return  ventaRepositori.SumaMontoTotal( idTienda, tipoOpercion);
+	}
+
+
+	@Override
+	public List<String> listaEgresoPorTienda(Integer idTienda, Integer tipoOpercion) {
+		// TODO Auto-generated method stub
+		return ventaRepositori.listaGastoTienda(idTienda, tipoOpercion);
 	}
 
 }

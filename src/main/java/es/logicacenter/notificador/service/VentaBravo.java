@@ -1,9 +1,11 @@
 package es.logicacenter.notificador.service;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -12,11 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import es.logicacenter.notificador.Enum.EnumOperacionTienda;
+import es.logicacenter.notificador.Enum.Tienda;
 import es.logicacenter.notificador.entity.Venta;
-import es.logicacenter.notificador.vo.InventarioResponse;
+import es.logicacenter.notificador.vo.BalanceReport;
+import es.logicacenter.notificador.vo.MensajeNotificadorVentaVo;
 import es.logicacenter.notificador.vo.Respuesta;
 import es.logicacenter.notificador.vo.Transaction;
 import okhttp3.MediaType;
@@ -45,21 +49,23 @@ public class VentaBravo {
 	
 	
 
-	
+	public static Integer OPERACION_GASTO = 2;
+	public static Integer OPERACION_VENTA = 1;
 	
 	@Autowired
 	public VentaBravo(VentaService ventaService) {
 		this.ventaService = ventaService;
 	}
 
-	public void bravoMain() throws IOException {
+	public void bravoMain(Long time) throws IOException {
 
+		
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse("application/json");
 		RequestBody body = RequestBody.create(mediaType,
 				"{\r\n    \"storeId\": \"47741e3f-634c-5944-a651-becbfee55cf7\",\r\n    \"userId\": \"cb02287f-7b46-5497-a2f6-114c3dcd60e4\",\r\n    \"countryId\": 2,\r\n    \"timezone\": \"America/Bogota\",\r\n    \"locale\": \"es-CO\",\r\n    \"zoom\": 25\r\n}");
 		Request request = new Request.Builder()
-				.url("https://api.prod.treinta.co/transaction/by-store/87d65767-13d2-58c7-a5d8-76c4ad6df3e0")
+				.url("https://api.prod.treinta.co/transaction/by-store/87d65767-13d2-58c7-a5d8-76c4ad6df3e0?startDate="+ time)
 
 				.addHeader("X-Api-Key", "TRE1NT@WEB")
 				.addHeader("X-Hash-Signature", "94230538bfea6b3dbb422444c02973e119ee82f20c30ab3673df0fa70ffe3465")
@@ -86,32 +92,63 @@ public class VentaBravo {
 				if (isExiteFolio == 0) {
 					log.info("Se Genera Venta en tienda Bravo " + transaction.getId());
 					Venta venta = new Venta();
+					MensajeNotificadorVentaVo mensajeNotifiador = new MensajeNotificadorVentaVo();
+					BalanceReport balanceReporte = response.getBalanceReport();
 					venta.setConsecutivo(0);
 					venta.setTipo("venta");
 					venta.setFechaHora(fechaHoraVenta());
 					venta.setFolio(transaction.getId());
-					venta.setFechaVenta(transaction.getCreatedAt());
+			        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); // D
+			        Date fecha = formatter.parse(transaction.getCreatedAt());
+			        venta.setFechaVenta( fecha);
 					
 					//String soloFecha = fechaHoraVenta().substring(0, 10);
-					String soloFecha = venta.getFechaVenta().substring(0, 10);
+					String soloFecha = transaction.getCreatedAt().substring(0, 10);
 					venta.setMonto(transaction.getValue());
-					double totalM = SumaMontoTotal( "63346365-3062-5566-b730-333266333235".trim(),"87d65767-13d2-58c7-a5d8-76c4ad6df3e0".trim() );
-					double operacionMonto =totalM + venta.getMonto();
+					//double totalM = SumaMontoTotal( "63346365-3062-5566-b730-333266333235".trim(),"87d65767-13d2-58c7-a5d8-76c4ad6df3e0".trim() );
+					//double operacionMonto =totalM + venta.getMonto();
 					// 30/12/2024 Venta LOGICA CENTER ROSAS centro de carga tipo c - Pagada Efectivo $200
-					String msjeVentDescripcion = soloFecha + "💰 lógica Center bravo "+ transaction.getDescription() + "- Pagada Efectivo $" +transaction.getValue() +  " 💵 Monto Total de Venta $" + operacionMonto;
-					
-					
-					venta.setDescripcion( msjeVentDescripcion );
+					double totalOtraTiendaVenta = SumaMontoTotal(Tienda.MORELOS.getValor(),
+							EnumOperacionTienda.OPERACION_VENTA.getValor());
+
+					double totalOtraTiendaGasto = SumaMontoTotal(Tienda.MORELOS.getValor(),
+							EnumOperacionTienda.OPERACION_GASTO.getValor());
+
+					// -------------------- mensaje de gasto tienda.
+					String msjeVentDescripcion = soloFecha + "💰 Lógica Center Bravo " + transaction.getDescription()
+							+ " 💵  Pagada Efectivo $" + transaction.getValue();
+					venta.setDescripcion(transaction.getDescription());
+					venta.setMensajeNotificacion(msjeVentDescripcion);
+					log.info(msjeVentDescripcion);
+					// se envia la notificacion
+
 					venta.setStoreId(transaction.getStoreId());
 					venta.setUserId(transaction.getUserId());
-					// se envia la notificacion
-					venta.setIsNotificacion(messageEnviadoNotificacionVenta(msjeVentDescripcion));
+					venta.setTipoOperacion(transaction.getTransactionTypeId());
+
+					mensajeNotifiador.setNombreTienda(" 🏪 Lógica Center Bravo");
+					mensajeNotifiador.setConcepto(msjeVentDescripcion);
+					mensajeNotifiador.setTipoOperacion(transaction.getTransactionTypeId());
+					mensajeNotifiador.setSumaEgresoDia(balanceReporte.getSpendings());
+					mensajeNotifiador.setMontoTotalTienda(balanceReporte.getSales());
+
+					// lista egreso
+					mensajeNotifiador.setListEgresos(
+							getListaGasto(Tienda.BRAVO.getValor(), EnumOperacionTienda.OPERACION_GASTO.getValor()));
+
+					mensajeNotifiador.setTotalVentaOtraTienda(totalOtraTiendaVenta);
+					mensajeNotifiador.setTotalGastoOtraTienda(totalOtraTiendaGasto);
+					// atributo para el nombre de otra tienda
+					mensajeNotifiador.setCatTienda(Tienda.MORELOS.getValor());
+
+					// --- Se llena el objeto mensaje notifictor ---
+
+					venta.setIsNotificacion(messageEnviadoNotificacionVenta(mensajeNotifiador));
+					
+					venta.setCatTienda(Tienda.BRAVO.getValor());
 					persitenciaVenta(venta);
 					
-					//se envia notifcacion inventario);
-					TelegramBotDynamicTemplate telegramBotDynamicTemplate = new TelegramBotDynamicTemplate(token);
-					telegramBotDynamicTemplate.SigleTelegramBravo(diaMax, token, chatidInventario);
-					
+				
 				} else {
 					//*******
 					log.info("No hay ventasen tienda Bravo");
@@ -122,12 +159,16 @@ public class VentaBravo {
 			e.printStackTrace();
 			log.error(e.getMessage());
 		}
+		
 
 	}
-	
-	public double SumaMontoTotal(String userId, String storeId) {
-	    Double sumaMonto = ventaService.SumaMonto(userId, storeId);
-	    return sumaMonto != null ? sumaMonto : 0.0;
+	public List<String> getListaGasto(int idTienda, int idOperacion) {
+		List<String> listaEgresoTienda = ventaService.listaEgresoPorTienda(idTienda, idOperacion);
+		return (listaEgresoTienda != null) ? listaEgresoTienda : new ArrayList<>();
+	}
+	public double SumaMontoTotal(Integer idTienda, Integer tipoOperacion) {
+		Double sumaMonto = ventaService.SumaMonto(idTienda, tipoOperacion);
+		return sumaMonto != null ? sumaMonto : 0.0;
 	}
 	
 	
@@ -143,25 +184,44 @@ public class VentaBravo {
 	}
 	
 	
-	public int  messageEnviadoNotificacionVenta(String msj) {
-		OkHttpClient client = new OkHttpClient().newBuilder().build();
-		MediaType mediaType = MediaType.parse("text/plain");
-		RequestBody body = RequestBody.create(mediaType, "");
-		Request request = new Request.Builder().url(
-				"https://api.telegram.org/bot7407891330:AAGdJGgQAapdSAAdBd5F3Uv761-ahMgrG0I/sendMessage?chat_id=@NotificacionVenta&text="
-						+ msj)
-				.addHeader("Authorization", "Basic Og==").build();
-		
-		try {
+	public int messageEnviadoNotificacionVenta(MensajeNotificadorVentaVo msj) throws IOException {
+
+		if (EnumOperacionTienda.OPERACION_GASTO.getValor() == msj.getTipoOperacion()) {
+			OkHttpClient client = new OkHttpClient().newBuilder().build();
+			MediaType mediaType = MediaType.parse("text/plain");
+			RequestBody body = RequestBody.create(mediaType, "");
+			Request request = new Request.Builder().url(
+					"https://api.telegram.org/bot7407891330:AAGdJGgQAapdSAAdBd5F3Uv761-ahMgrG0I/sendMessage?chat_id=@NotificacionVenta&text="
+							+"👛 Gasto del dia "+"\n\n" + msj.getConcepto())
+					.addHeader("Authorization", "Basic Og==").build();
+
 			Response response = client.newCall(request).execute();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			log.info("se envia notificacion  de gatos*******" + msj);
+
+			return 1;
+
+		} else if (EnumOperacionTienda.OPERACION_VENTA.getValor() == msj.getTipoOperacion()) {
+			log.info("se envia notificacion para venta ..." + msj.getConcepto());
+			
+			TelegramBotDynamicTemplateNotificacionVenta telegraVenta  = new TelegramBotDynamicTemplateNotificacionVenta(token);
+			telegraVenta.enviarNotiMain("7407891330:AAGdJGgQAapdSAAdBd5F3Uv761-ahMgrG0I", "@NotificacionVenta", msj);
+			
+			
+			// se envia notificacion para inventario
+			
+			TelegramBotDynamicTemplate telegramBotDynamicTemplate = new TelegramBotDynamicTemplate(token);
+			telegramBotDynamicTemplate.SigleTelegram(diaMax, token, chatidInventario);
+			
+			
+			
+			return 1;
+		} else {
 			return 0;
 		}
-		log.info("se envia notificacion *******" + msj);
-		return 1;
+
 	}
+	
 	
 	
 	

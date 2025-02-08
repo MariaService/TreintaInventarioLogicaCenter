@@ -154,7 +154,6 @@ public class PdfReader {
 
 		JSONObject venta = new JSONObject();
 		venta.put("fecha", fecha);
-		ventaPersi.setFechaVenta(fecha);
 
 		ventaPersi.setFechaHora(fechaHoraVenta());
 		venta.put("tipo", "Venta");
@@ -177,7 +176,7 @@ public class PdfReader {
 			// existe folio
 			log.info(" Nuevo folio ****** " + ventaPersi.getFolio());
 			ventaPersi.setIsNotificacion(1);
-
+ 
 			log.info("Se envia notificacion a Venta");
 			//messageEnviadoNotificacion(ventaPersi.getDescripcion());
 

@@ -57,7 +57,7 @@ public class CronJobTask {
 		log.info("Se consulta tienda  Logica center ...");
 		ventaLogicaCenter.LogicaCenterMain(obtenerTimeReporte());
 		log.info("Se consulta tienda Bravo ...");
-		ventaBravo.bravoMain();
+		ventaBravo.bravoMain( obtenerTimeReporte());
 
 	}
 
