@@ -141,11 +141,9 @@ public class VentaLogicaCenter {
 					// --- Se llena el objeto mensaje notifictor ---
 
 					venta.setIsNotificacion(messageEnviadoNotificacionVenta(mensajeNotifiador));
-					
+
 					venta.setCatTienda(Tienda.MORELOS.getValor());
 					persitenciaVenta(venta);
-
-			     	
 
 				} else {
 					// *******
@@ -189,29 +187,33 @@ public class VentaLogicaCenter {
 			RequestBody body = RequestBody.create(mediaType, "");
 			Request request = new Request.Builder().url(
 					"https://api.telegram.org/bot7407891330:AAGdJGgQAapdSAAdBd5F3Uv761-ahMgrG0I/sendMessage?chat_id=@NotificacionVenta&text="
-							+"👛 Gasto del dia "+"\n\n" + msj.getConcepto())
+							+ "📌 Gasto del dia " + "\n\n" + msj.getConcepto())
 					.addHeader("Authorization", "Basic Og==").build();
 
-			Response response = client.newCall(request).execute();
-
-			log.info("se envia notificacion  de gatos*******" + msj);
+			try (Response response = client.newCall(request).execute()) {
+				if (response.body() != null) {
+					String responseBody = response.body().string(); // Procesa la respuesta
+					log.info(responseBody);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				log.error(e.toString());
+			}
 
 			return 1;
 
 		} else if (EnumOperacionTienda.OPERACION_VENTA.getValor() == msj.getTipoOperacion()) {
 			log.info("se envia notificacion para venta ..." + msj.getConcepto());
-			
-			TelegramBotDynamicTemplateNotificacionVenta telegraVenta  = new TelegramBotDynamicTemplateNotificacionVenta(token);
+
+			TelegramBotDynamicTemplateNotificacionVenta telegraVenta = new TelegramBotDynamicTemplateNotificacionVenta(
+					token);
 			telegraVenta.enviarNotiMain("7407891330:AAGdJGgQAapdSAAdBd5F3Uv761-ahMgrG0I", "@NotificacionVenta", msj);
-			
-			
+
 			// se envia notificacion para inventario
-			
+
 			TelegramBotDynamicTemplate telegramBotDynamicTemplate = new TelegramBotDynamicTemplate(token);
 			telegramBotDynamicTemplate.SigleTelegram(diaMax, token, chatidInventario);
-			
-			
-			
+
 			return 1;
 		} else {
 			return 0;
