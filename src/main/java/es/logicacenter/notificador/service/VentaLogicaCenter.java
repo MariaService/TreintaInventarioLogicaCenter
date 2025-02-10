@@ -55,7 +55,7 @@ public class VentaLogicaCenter {
 		this.ventaService = ventaService;
 	}
 
-	public void LogicaCenterMain(Long time) throws IOException {
+	public void LogicaCenterMain(Long inicio, Long fin) throws IOException {
 
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse("application/json");
@@ -63,7 +63,7 @@ public class VentaLogicaCenter {
 				"{\r\n    \"storeId\": \"47741e3f-634c-5944-a651-becbfee55cf7\",\r\n    \"userId\": \"cb02287f-7b46-5497-a2f6-114c3dcd60e4\",\r\n    \"countryId\": 2,\r\n    \"timezone\": \"America/Bogota\",\r\n    \"locale\": \"es-CO\",\r\n    \"zoom\": 25\r\n}");
 		Request request = new Request.Builder()
 				.url("https://api.prod.treinta.co/transaction/by-store/47741e3f-634c-5944-a651-becbfee55cf7?startDate="
-						+ time)
+						+ inicio + "&endDate=" + fin)
 				.addHeader("X-Api-Key", "TRE1NT@WEB")
 				.addHeader("X-Hash-Signature", "94230538bfea6b3dbb422444c02973e119ee82f20c30ab3673df0fa70ffe3465")
 				.addHeader("Content-Type", "application/json")
@@ -91,7 +91,6 @@ public class VentaLogicaCenter {
 					MensajeNotificadorVentaVo mensajeNotifiador = new MensajeNotificadorVentaVo();
 					BalanceReport balanceReporte = response.getBalanceReport();
 					venta.setConsecutivo(0);
-					venta.setTipo("venta");
 					venta.setFechaHora(fechaHoraVenta());
 					venta.setFolio(transaction.getId());
 
@@ -143,6 +142,7 @@ public class VentaLogicaCenter {
 					venta.setIsNotificacion(messageEnviadoNotificacionVenta(mensajeNotifiador));
 
 					venta.setCatTienda(Tienda.MORELOS.getValor());
+					venta.setTipo(transaction.getTransactionTypeId() == OPERACION_VENTA ? "Venta" : "Gasto");
 					persitenciaVenta(venta);
 
 				} else {

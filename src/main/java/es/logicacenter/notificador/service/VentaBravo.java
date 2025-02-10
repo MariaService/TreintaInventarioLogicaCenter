@@ -55,7 +55,7 @@ public class VentaBravo {
 		this.ventaService = ventaService;
 	}
 
-	public void bravoMain(Long time) throws IOException {
+	public void bravoMain(Long inicio, long fin) throws IOException {
 
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse("application/json");
@@ -63,7 +63,7 @@ public class VentaBravo {
 				"{\r\n    \"storeId\": \"47741e3f-634c-5944-a651-becbfee55cf7\",\r\n    \"userId\": \"cb02287f-7b46-5497-a2f6-114c3dcd60e4\",\r\n    \"countryId\": 2,\r\n    \"timezone\": \"America/Bogota\",\r\n    \"locale\": \"es-CO\",\r\n    \"zoom\": 25\r\n}");
 		Request request = new Request.Builder()
 				.url("https://api.prod.treinta.co/transaction/by-store/87d65767-13d2-58c7-a5d8-76c4ad6df3e0?startDate="
-						+ time)
+						+ inicio+"&endDate="+fin)
 
 				.addHeader("X-Api-Key", "TRE1NT@WEB")
 				.addHeader("X-Hash-Signature", "94230538bfea6b3dbb422444c02973e119ee82f20c30ab3673df0fa70ffe3465")
@@ -93,7 +93,7 @@ public class VentaBravo {
 					MensajeNotificadorVentaVo mensajeNotifiador = new MensajeNotificadorVentaVo();
 					BalanceReport balanceReporte = response.getBalanceReport();
 					venta.setConsecutivo(0);
-					venta.setTipo("venta");
+					
 					venta.setFechaHora(fechaHoraVenta());
 					venta.setFolio(transaction.getId());
 					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); // D
@@ -147,6 +147,7 @@ public class VentaBravo {
 					venta.setIsNotificacion(messageEnviadoNotificacionVenta(mensajeNotifiador));
 
 					venta.setCatTienda(Tienda.BRAVO.getValor());
+					venta.setTipo(transaction.getTransactionTypeId() == OPERACION_VENTA ? "Venta" :"Gasto");
 					persitenciaVenta(venta);
 
 				} else {

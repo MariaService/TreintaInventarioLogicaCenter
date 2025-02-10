@@ -55,9 +55,9 @@ public class CronJobTask {
 	public void ejecutarCadaDosMinuto() throws IOException {
 		log.info("Tarea ejecutada a las: " + obtenerfechaActual());
 		log.info("Se consulta tienda  Logica center ...");
-		ventaLogicaCenter.LogicaCenterMain(obtenerTimeReporte());
+		ventaLogicaCenter.LogicaCenterMain(obtenerfechaInicio(), obtenerfechaFin());
 		log.info("Se consulta tienda Bravo ...");
-		ventaBravo.bravoMain( obtenerTimeReporte());
+		ventaBravo.bravoMain( obtenerfechaInicio(), obtenerfechaFin());
 
 	}
 
@@ -143,7 +143,9 @@ public class CronJobTask {
 
 	}
 
-	public Long obtenerTimeReporte() {
+	
+	
+	public Long obtenerfechaInicio() {
 
 		LocalDate fecha = LocalDate.now();
 
@@ -172,4 +174,39 @@ public class CronJobTask {
 		return fechaFinal;
 	}
 
+	
+	public Long obtenerfechaFin() {
+
+		LocalDate fecha = LocalDate.now();
+
+		// Extrae el día, mes y año
+		int dia = fecha.getDayOfMonth();
+		int mes = fecha.getMonthValue();
+		int año = fecha.getYear();
+
+		//
+//		
+//		LocalDateTime fecha_ = LocalDateTime.of(2024, 12, 04, 0, 0, 0);
+		int diaReporte = dia;
+		int diames= mes +1;
+		LocalDateTime fecha_ = LocalDateTime.of(año, diames, diaReporte, 0, 0, 0);
+		// Convertir a timestamp en milisegundos (UTC)
+		long timestamp = fecha_.toInstant(ZoneOffset.UTC).toEpochMilli();
+
+		long fechaInicial = timestamp;
+
+		// Diferencia en milisegundos (6 horas)
+		long diferenciaMillis = 6 * 60 * 60 * 1000; // 6 horas a milisegundos
+
+		// Calcular la nueva fecha
+		long fechaFinal = fechaInicial + diferenciaMillis;
+
+		// Mostrar el resultado
+		return fechaFinal;
+	}
+
+	
+	
+	
+	
 }
